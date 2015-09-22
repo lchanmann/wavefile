@@ -42,6 +42,7 @@ module WaveFile
       raw_format_chunk, sample_frame_count = HeaderReader.new(@file, @file_name).read_until_data_chunk
       @current_sample_frame = 0
       @total_sample_frames = sample_frame_count
+      @data_chunk_loc = @file.pos
 
       # Make file is in a format we can actually read
       validate_format_chunk(raw_format_chunk)
@@ -149,6 +150,14 @@ module WaveFile
       buffer.convert(@format)
     end
 
+    # Seek and read from "start" second until "length"
+    def seek_and_read start, length
+      offset = start * @native_format.sample_rate * @native_format.block_align
+      sample_frame_count = length * @native_format.sample_rate
+
+      @file.sysseek(@data_chunk_loc + offset, IO::SEEK_SET)
+      read(sample_frame_count)
+    end
 
     # Returns true if the Reader is closed, and false if it is open and available for reading.
     def closed?
