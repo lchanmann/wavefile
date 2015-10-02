@@ -152,7 +152,7 @@ module WaveFile
 
     # Seek and read from "start" second until "length"
     def seek_and_read start, length
-      offset = start * @native_format.sample_rate * @native_format.block_align
+      offset = (start * @native_format.sample_rate * @native_format.block_align).round
       sample_frame_count = length * @native_format.sample_rate
 
       @file.sysseek(@data_chunk_loc + offset, IO::SEEK_SET)
